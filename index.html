@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vroom Vroom Chooser — every electric car on sale in Australia, by price and size</title>
+<link rel="stylesheet" href="styles.css?v=12">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 40 24" width="34" height="20"><path d="M2 17 L6 9 Q8 5 13 5 L24 5 Q28 5 31 9 L38 13 L38 17 Z" fill="#fff"/><circle cx="11" cy="18" r="4" fill="#1a0a0a"/><circle cx="30" cy="18" r="4" fill="#1a0a0a"/><path d="M0 12 L7 12 M0 15 L5 15" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>Vroom Vroom <span class="au">Chooser</span></div>
+  <div class="topbar-controls">
+    <label class="ctl">Register in
+      <select id="stateSel"></select>
+    </label>
+    <div class="seg" id="priceMode" role="radiogroup" aria-label="Price shown">
+      <button data-mode="driveaway" class="on" role="radio" aria-checked="true">Est. driveaway</button>
+      <button data-mode="rrp" role="radio" aria-checked="false">List price</button>
+    </div>
+    <div class="seg" id="viewMode" role="radiogroup" aria-label="View">
+      <button data-view="grid" class="on" role="radio" aria-checked="true">Showroom</button>
+      <button data-view="chart" role="radio" aria-checked="false">Chart</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="filters" id="filters">
+    <div class="f-head">
+      <h2>Narrow it down</h2>
+      <button id="resetFilters" class="link">Reset</button>
+      <button id="closeFilters" class="close-filters" aria-label="Close filters">×</button>
+    </div>
+
+    <section class="f-group saved">
+      <div class="f-label">Saved searches</div>
+      <div id="savedList" class="saved-list"></div>
+      <form id="saveForm" class="save-form"><input type="text" id="saveName" placeholder="Name this search, e.g. Family SUV under 70k" maxlength="40"><button type="submit" class="primary small">Save</button></form>
+      <div class="f-hint">Saves the filters, sort and state below. The page link also carries them, so you can bookmark it.</div>
+    </section>
+
+    <section class="f-group">
+      <input type="search" id="search" class="search" placeholder="Search brand or model, e.g. Kia, Seal, ID. Buzz">
+    </section>
+
+    <section class="f-group">
+      <label class="f-label" for="budget">Budget (max) <span class="f-num"><span class="pre">$</span><input type="number" id="budgetNum" inputmode="numeric" class="num"><span class="post"></span></span></label>
+      <input type="range" id="budget" min="20000" max="250000" step="1000" value="250000">
+      <div class="f-hint" id="budgetHint"></div>
+
+    </section>
+
+    <section class="f-group">
+      <label class="f-label" for="bootMin">Boot space (min, seats up) <span class="f-num"><span class="pre"></span><input type="number" id="bootMinNum" inputmode="numeric" class="num"><span class="post">L</span></span></label>
+      <input type="range" id="bootMin" min="0" max="900" step="10" value="0">
+      <div class="f-hint">Litres behind the last row of seats</div>
+    </section>
+
+    <section class="f-group">
+      <label class="f-label" for="lenMax">Length (max) <span class="f-num"><span class="pre"></span><input type="number" id="lenMaxNum" inputmode="numeric" class="num"><span class="post">mm</span></span></label>
+      <input type="range" id="lenMax" min="3500" max="5400" step="50" value="5400">
+      <div class="f-hint">Standard parking bay is 5.4 m long, a single garage is usually 5.5 to 6 m</div>
+    </section>
+
+    <section class="f-group">
+      <label class="f-label" for="widMax">Width (max, mirrors folded) <span class="f-num"><span class="pre"></span><input type="number" id="widMaxNum" inputmode="numeric" class="num"><span class="post">mm</span></span></label>
+      <input type="range" id="widMax" min="1600" max="2050" step="10" value="2050">
+
+    </section>
+
+    <section class="f-group">
+      <label class="f-label" for="rangeMin">Range (min, WLTP) <span class="f-num"><span class="pre"></span><input type="number" id="rangeMinNum" inputmode="numeric" class="num"><span class="post">km</span></span></label>
+      <input type="range" id="rangeMin" min="0" max="800" step="10" value="0">
+
+    </section>
+
+    <section class="f-group">
+      <div class="f-label">Body style</div>
+      <div class="chips" id="bodyChips"></div>
+    </section>
+
+    <section class="f-group">
+      <div class="f-label">Seats</div>
+      <div class="chips" id="seatChips">
+        <button data-v="any" class="on">Any</button>
+        <button data-v="5">5+</button>
+        <button data-v="6">6+</button>
+        <button data-v="7">7</button>
+      </div>
+    </section>
+
+    <section class="f-group">
+      <div class="f-label">Drive</div>
+      <div class="chips" id="driveChips">
+        <button data-v="any" class="on">Any</button>
+        <button data-v="2wd">2WD</button>
+        <button data-v="AWD">AWD</button>
+      </div>
+    </section>
+
+    <section class="f-group">
+      <div class="f-label">Brand origin</div>
+      <div class="chips" id="originChips">
+        <button data-v="any" class="on">Any</button>
+        <button data-v="cn">Chinese</button>
+        <button data-v="non">Non-Chinese</button>
+      </div>
+      <label class="f-check"><input type="checkbox" id="cnOwned"><span class="t">Count Chinese-owned brands as Chinese <span id="cnOwnedList"></span></span></label>
+    </section>
+
+    <section class="f-group">
+      <div class="f-label">Brands <button class="link small" id="brandAll">all</button> <button class="link small" id="brandNone">none</button></div>
+      <div class="brand-list" id="brandList"></div>
+    </section>
+    <div class="f-apply"><button id="applyFilters" class="primary">Show results</button></div>
+  </aside>
+
+  <main class="content">
+    <div class="results-head">
+      <button id="openFilters" class="filters-btn">☰ Filters</button>
+      <div>
+        <h1 id="resultCount">Loading…</h1>
+        <p class="sub" id="resultSub"></p>
+      </div>
+      <label class="ctl">Sort
+        <select id="sortSel">
+          <option value="price">Price: low to high</option>
+          <option value="boot">Boot: biggest first</option>
+          <option value="value">Boot litres per $10k</option>
+          <option value="short">Length: shortest first</option>
+          <option value="long">Length: longest first</option>
+          <option value="range">Range: longest first</option>
+          <option value="resale">Resale: keeps most value</option>
+          <option value="loss">3-yr depreciation: lowest $</option>
+          <option value="brand">Brand A to Z</option>
+        </select>
+      </label>
+    </div>
+    <div id="grid" class="grid"></div>
+    <div id="chartView" class="chart-view hidden"></div>
+    <p class="disclaimer">Prices are manufacturer list prices or brand-quoted driveaway prices as of the date shown on each car. Driveaway estimates add stamp duty, registration/CTP and dealer delivery using simplified state rules and will differ from a dealer quote. Boot volumes use each brand's published VDA figure, which brands do not all measure the same way. Verify before you buy.</p>
+  </main>
+</div>
+
+<div class="compare-tray hidden" id="compareTray">
+  <div class="tray-items" id="trayItems"></div>
+  <div class="tray-actions">
+    <button id="openCompare" class="primary">Compare</button>
+    <button id="clearCompare" class="ghost">Clear</button>
+  </div>
+</div>
+
+<div class="modal hidden" id="detailModal" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" id="detailPanel"></div>
+</div>
+
+<div class="modal hidden holo-modal" id="holoModal" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="holo-stage" id="holoStage"></div>
+</div>
+
+<div class="modal hidden studio-modal" id="studioModal" role="dialog" aria-modal="true" aria-label="3D configurator">
+  <div class="modal-backdrop" data-close></div>
+  <div class="studio-stage" id="studioStage"></div>
+</div>
+
+<div class="modal hidden" id="compareModal" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel wide" id="comparePanel"></div>
+</div>
+
+<script src="data.js?v=10"></script>
+<script src="img/credits.js"></script>
+<script src="logos/index.js"></script>
+<script src="resale.js?v=8"></script>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/addons/"}}</script>
+<script src="app.js?v=11"></script>
+<script type="module" src="holo.js?v=10"></script>
+<script type="module" src="studio.js?v=11"></script>
+</body>
+</html>
