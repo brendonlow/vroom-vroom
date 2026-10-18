@@ -398,12 +398,12 @@
     const px = 56;
     const persons = `<g fill="#8a8985"><circle cx="${px}" cy="${base - 118}" r="7"/><rect x="${px - 6}" y="${base - 108}" width="12" height="40" rx="5"/><rect x="${px - 5}" y="${base - 70}" width="4" height="70"/><rect x="${px + 1}" y="${base - 70}" width="4" height="70"/></g><text x="${px}" y="${base + 16}" text-anchor="middle" font-size="10" fill="#8a8985">1.75 m</text>`;
     return `<h3>Front view, to scale</h3>
-      <svg viewBox="0 0 ${W} ${H}">${outline(ref, 170, "rgba(0,0,0,.06)", "#8a8985")}${outline(car, 170, "rgba(42,120,214,.3)", "#2a78d6")}
-        <line x1="20" x2="${W - 20}" y1="${base}" y2="${base}" stroke="#c9c9c3"/>
-        <text x="330" y="${base - 95}" font-size="12" fill="#1b5aa8" font-weight="600">${car.brand} ${car.model} · ${m(car.width)} wide, ${m(car.height)} tall</text>
-        <text x="330" y="${base - 75}" font-size="12" fill="#52514e">${ref.name} · ${m(ref.width)} wide, ${m(ref.height)} tall</text>
+      <div class="front-view"><svg viewBox="20 0 280 ${H}">${outline(ref, 170, "rgba(0,0,0,.06)", "#8a8985")}${outline(car, 170, "rgba(42,120,214,.3)", "#2a78d6")}
+        <line x1="20" x2="300" y1="${base}" y2="${base}" stroke="#c9c9c3"/>
         ${persons}
       </svg>
+      <div class="legend"><div><span class="sw" style="background:rgba(42,120,214,.5);border:1px solid #2a78d6"></span><b>${car.brand} ${car.model}</b><br>${m(car.width)} wide, ${m(car.height)} tall</div>
+        <div><span class="sw" style="background:rgba(0,0,0,.08);border:1px solid #8a8985"></span><b>${ref.name}</b><br>${m(ref.width)} wide, ${m(ref.height)} tall</div></div></div>
       <div class="note">Longer than <b>${pctL}%</b> of the EVs on sale, with a bigger boot than <b>${pctB}%</b> of them.</div>
       <h3 style="margin-top:14px">Closest-sized ${BODY_LABEL[car.body]}s</h3>
       <div class="boot-bars">${peers.map(p => `<div class="boot-bar peer" data-open="${p.id}" style="cursor:pointer"><span>${p.brand} ${p.model}</span><div class="track"><div class="fill ${p.length > car.length ? "" : "ref"}" style="width:${(p.length - 3400) / 2000 * 100}%"></div></div><b>${m(p.length)}</b></div>`).join("")}</div>`;
@@ -419,6 +419,7 @@
     const stage = detail.tab === "footprint" ? stageFootprint(car) : detail.tab === "boot" ? stageBoot(car) : stageSize(car);
     const spec = (k, val, unit = "") => `<div class="spec"><div class="k">${k}</div><div class="v">${val == null || val === "" ? "—" : val}<small> ${unit}</small></div></div>`;
     panel.innerHTML = `
+      <div class="m-bar"><button class="m-back" data-close>‹ Showroom</button><span>${car.brand} ${car.model}</span></div>
       <button class="close" data-close aria-label="Close">×</button>
       <div class="detail">
         <div class="d-stage">
@@ -608,7 +609,7 @@
   function renderCompare() {
     const cars = state.compare.map(id => D.cars.find(c => c.id === id)).filter(Boolean);
     const panel = $("#comparePanel");
-    if (!cars.length) { panel.innerHTML = `<button class="close" data-close>×</button><div class="compare"><h2>Pick up to four cars to compare</h2></div>`; return; }
+    if (!cars.length) { panel.innerHTML = `<div class="m-bar"><button class="m-back" data-close>‹ Showroom</button><span>Compare</span></div><button class="close" data-close>×</button><div class="compare"><h2>Pick up to four cars to compare</h2></div>`; return; }
     const sel = cars.map(c => { const ch = state.chosen[c.id] || {}; const i = ch.v != null ? ch.v : Math.max(0, c.variants.findIndex(v => passesVariant(v, c))); const ps = paintsFor(c); const pi = ch.p != null ? ch.p : Math.max(0, ps.findIndex(p => p.name === defaultPaint(c).name)); return { car: c, v: c.variants[i], vIdx: i, paint: ps[pi] }; });
     const row = (label, get, best, fmtv = x => x, sub) => {
       const vals = sel.map(get);
@@ -617,7 +618,7 @@
       const target = best && nums.length && !allSame ? (best === "min" ? Math.min(...nums) : Math.max(...nums)) : null;
       return `<tr><td>${label}</td>${vals.map((x, i) => `<td class="${target != null && x === target && nums.length > 1 ? "best" : ""}">${x == null ? "—" : fmtv(x)}${sub ? `<div class="sub">${sub(sel[i])}</div>` : ""}</td>`).join("")}</tr>`;
     };
-    panel.innerHTML = `<button class="close" data-close aria-label="Close">×</button>
+    panel.innerHTML = `<div class="m-bar"><button class="m-back" data-close>‹ Showroom</button><span>Side by side</span></div><button class="close" data-close aria-label="Close">×</button>
       <div class="compare"><h2>Side by side</h2>
       <table>
         <thead><tr><th></th>${sel.map(s => `<th><div class="sil">${photo(s.car, s.paint.hex)}</div>${s.car.brand} ${s.car.model}<br>
